@@ -84,3 +84,7 @@ output_layer_state = exp(inputs_to_softmax);
 % Normalize to get probability distribution.
 output_layer_state = output_layer_state ./ repmat(...
   sum(output_layer_state, 1), vocab_size, 1);
+  
+  
+ # My Theory
+ #The file contains basically five compuation.

@@ -14,7 +14,8 @@ else
   start_time = clock;
 end
 
-% SET HYPERPARAMETERS HERE.
+
+%% SET HYPERPARAMETERS HERE.
 batchsize = 100;  % Mini-batch size.
 learning_rate = 0.1;  % Learning rate; default = 0.1.
 momentum = 0.9;  % Momentum; default = 0.9.
@@ -27,56 +28,94 @@ init_wt = 0.01;  % Standard deviation of the normal distribution
 show_training_CE_after = 100;
 show_validation_CE_after = 1000;
 
-% LOAD DATA.
+%% LOAD DATA.
+% Train input 
 [train_input, train_target, valid_input, valid_target, ...
   test_input, test_target, vocab] = load_data(batchsize);
+disp 'The size of traiing data is: ',size(train_input)
+disp 'The size of Rcrossvalid target is: ',size(train_target)
+disp 'The size of crossvalid data is: ',size(valid_input)
+disp 'The size of crossvalid target is: ',size(valid_target)
+disp 'The size of test data is: ',size(test_input)
+disp 'The size of test target is: ',size(test_target)
 [numwords, batchsize, numbatches] = size(train_input); 
 vocab_size = size(vocab, 2);
 
-% INITIALIZE WEIGHTS AND BIASES.
-word_embedding_weights = init_wt * randn(vocab_size, numhid1);  # size = (250 * 50)
-embed_to_hid_weights = init_wt * randn(numwords * numhid1, numhid2);  # size = (150 * 200)
-hid_to_output_weights = init_wt * randn(numhid2, vocab_size);  # size = (200 * 250)
-hid_bias = zeros(numhid2, 1); # size = (200 * 1)
-output_bias = zeros(vocab_size, 1); # size = (250 * 1)
+% About the size:
+% The size of train input is : 3    100   3725
+% This means their are 3725 mini-batches each of size 100. 
+% And each column of the mini-batch represents a training sample
+% with three inputs i.e word1, word2 and word3
 
-word_embedding_weights_delta = zeros(vocab_size, numhid1); # size = (250 * 50)
-word_embedding_weights_gradient = zeros(vocab_size, numhid1); # size = (250 * 50)
-embed_to_hid_weights_delta = zeros(numwords * numhid1, numhid2); # size = (150 * 200)
-hid_to_output_weights_delta = zeros(numhid2, vocab_size); # size = (200 * 250)
-hid_bias_delta = zeros(numhid2, 1); # size = (200 * 1)
-output_bias_delta = zeros(vocab_size, 1); # size = (250 * 1)
-expansion_matrix = eye(vocab_size); # size = (250 * 250)
+
+
+
+%% INITIALIZE WEIGHTS AND BIASES.
+% Every word in the vocabulary is given a weight for each neuron in the
+% embedding layer, embedding layer constitutes of 50 neurons.
+word_embedding_weights = init_wt * randn(vocab_size, numhid1);  % size = (250 * 50)
+
+% Their are three embedding layer(for each input of word1, word2, word3) 
+% with 50 neurons each. Each neuron will connect to the 200 neurons in the 
+% hidden layer with a weight. SO we have a matrix of sixe (150x200)
+embed_to_hid_weights = init_wt * randn(numwords * numhid1, numhid2);  % size = (150 * 200)
+
+% The output layer will have 250 output (vacabulary size), where each
+% output will have a probability of occuring as 4th word. And since all the 
+% neurons in hidden layer will connect to all the output units with is 250
+% Hence the size of the matrix is (200x250)
+hid_to_output_weights = init_wt * randn(numhid2, vocab_size);  % size = (200 * 250)
+
+% The hidden unit and the output unit have baises which are added as below
+hid_bias = zeros(numhid2, 1); % size = (200 * 1)
+output_bias = zeros(vocab_size, 1); % size = (250 * 1)
+
+% Declaring and initializing empty matrixes to store output of each layer
+word_embedding_weights_delta = zeros(vocab_size, numhid1); % size = (250 * 50)
+word_embedding_weights_gradient = zeros(vocab_size, numhid1);  % size = (250 * 50)
+embed_to_hid_weights_delta = zeros(numwords * numhid1, numhid2); % size = (150 * 200)
+hid_to_output_weights_delta = zeros(numhid2, vocab_size); % size = (200 * 250)
+hid_bias_delta = zeros(numhid2, 1); % size = (200 * 1)
+output_bias_delta = zeros(vocab_size, 1); % size = (250 * 1)
+expansion_matrix = eye(vocab_size); % size = (250 * 250)
 count = 0;
 tiny = exp(-30);
 
-% TRAIN.
+
+%% TRAIN.
 for epoch = 1:epochs
   fprintf(1, 'Epoch %d\n', epoch);
   this_chunk_CE = 0;
   trainset_CE = 0;
   % LOOP OVER MINI-BATCHES.
   for m = 1:numbatches
-    input_batch = train_input(:, :, m);
-    target_batch = train_target(:, :, m);
+    input_batch = train_input(:, :, m); % The input batch is of size [3x100]
+    target_batch = train_target(:, :, m); % The target batch is of size [1x100]
 
     % FORWARD PROPAGATE.
     % Compute the state of each layer in the network given the input batch
     % and all weights and biases
     [embedding_layer_state, hidden_layer_state, output_layer_state] = ...
       fprop(input_batch, ...
-            word_embedding_weights, embed_to_hid_weights, ...
-            hid_to_output_weights, hid_bias, output_bias);
+            word_embedding_weights, ...
+            embed_to_hid_weights, ...
+            hid_to_output_weights, ...
+            hid_bias, ...
+            output_bias);
 
-    % COMPUTE DERIVATIVE.
-    %% Expand the target to a sparse 1-of-K vector.
+    %% COMPUTE DERIVATIVE.
+    % Expand the target to a sparse 1-of-K vector.
     expanded_target_batch = expansion_matrix(:, target_batch);
-    %% Compute derivative of cross-entropy loss function.
+    
+    % Compute derivative of cross-entropy loss function. The difference in
+    % actuall value and the output_layer_state as one forward pass
     error_deriv = output_layer_state - expanded_target_batch;
 
-    % MEASURE LOSS FUNCTION.
+    % MEASURE LOSS FUNCTION. calclating error using Cross Entropy
     CE = -sum(sum(...
       expanded_target_batch .* log(output_layer_state + tiny))) / batchsize;
+    % we add a tiny amount of noise to output_layer_state because log(0)
+    % will turn to infinity if the value is not added.
     count =  count + 1;
     this_chunk_CE = this_chunk_CE + (CE - this_chunk_CE) / count;
     trainset_CE = trainset_CE + (CE - trainset_CE) / m;
@@ -99,7 +138,9 @@ for epoch = 1:epochs
 
     %% HIDDEN LAYER.
     % FILL IN CODE. Replace the line below by one of the options.
-    embed_to_hid_weights_gradient = zeros(numhid1 * numwords, numhid2);
+    %embed_to_hid_weights_gradient = zeros(numhid1 * numwords, numhid2);
+    embed_to_hid_weights_gradient = ...
+        embedding_layer_state * back_propagated_deriv_1';
     % Options:
     % (a) embed_to_hid_weights_gradient = back_propagated_deriv_1' * embedding_layer_state;
     % (b) embed_to_hid_weights_gradient = embedding_layer_state * back_propagated_deriv_1';
@@ -107,7 +148,8 @@ for epoch = 1:epochs
     % (d) embed_to_hid_weights_gradient = embedding_layer_state;
 
     % FILL IN CODE. Replace the line below by one of the options.
-    hid_bias_gradient = zeros(numhid2, 1);
+    %hid_bias_gradient = zeros(numhid2, 1);
+    hid_bias_gradient = sum(back_propagated_deriv_1, 2);
     % Options
     % (a) hid_bias_gradient = sum(back_propagated_deriv_1, 2);
     % (b) hid_bias_gradient = sum(back_propagated_deriv_1, 1);
@@ -115,7 +157,9 @@ for epoch = 1:epochs
     % (d) hid_bias_gradient = back_propagated_deriv_1';
 
     % FILL IN CODE. Replace the line below by one of the options.
-    back_propagated_deriv_2 = zeros(numhid2, batchsize);
+    % back_propagated_deriv_2 = zeros(numhid2, batchsize);
+    back_propagated_deriv_2 = ...
+        back_propagated_deriv_1 * embed_to_hid_weights'
     % Options
     % (a) back_propagated_deriv_2 = embed_to_hid_weights * back_propagated_deriv_1;
     % (b) back_propagated_deriv_2 = back_propagated_deriv_1 * embed_to_hid_weights;
@@ -184,7 +228,8 @@ if OctaveMode
 end
 fprintf(1, 'Final Training CE %.3f\n', trainset_CE);
 
-% EVALUATE ON VALIDATION SET.
+
+%% EVALUATE ON VALIDATION SET.
 fprintf(1, '\rRunning validation ...');
 if OctaveMode
   fflush(1);

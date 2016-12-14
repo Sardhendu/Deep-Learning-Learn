@@ -28,4 +28,5 @@ for i = 1:k
 end
 
 
-#/Users/sam/All-Program/App-DataSet/Deep-Neural-Nets/Coursera/assignment2/
+%addpath('/Users/sam/All-Program/App-DataSet/Deep-Neural-Nets/Coursera/assignment2/')
+%addpath('/Users/sam/All-Program/App/Deep-Neural-Nets/Coursera/assignment2/')

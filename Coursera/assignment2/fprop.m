@@ -8,7 +8,7 @@ function [embedding_layer_state, hidden_layer_state, output_layer_state] = ...
 %     So, if input_batch(i, j) = k then the ith word in data point j is word
 %     index k of the vocabulary.
 %
-%   word_embedding_weights: Word embedding as a matrix of size
+%   word_embedding_weights (250x50): Word embedding as a matrix of size
 %     vocab_size X numhid1, where vocab_size is the size of the vocabulary
 %     numhid1 is the dimensionality of the embedding space.
 %
@@ -38,31 +38,49 @@ function [embedding_layer_state, hidden_layer_state, output_layer_state] = ...
 [vocab_size, numhid1] = size(word_embedding_weights);
 numhid2 = size(embed_to_hid_weights, 2);
 
-%% COMPUTE STATE OF WORD EMBEDDING LAYER.
+%% COMPUTE STATE OF WORD EMBEDDING LAYER. --> weights coming in
 % Look up the inputs word indices in the word_embedding_weights matrix.
+% reshape(input_batch, 1, []) -> will convert (3x100) into (1x300)-->
+% word1,word2,word3,word1,word2,word3,word1,word2,word3.......300
+
+% word_embedding_weights(1,:)' will  fetch the first row. 
+% so word_embedding_weights(reshape(input_batch, 1, []),:)' will fetch the
+% rows corresponding to all word1,word2,word3,word1,word2,word3....... and
+% transpose it hence becomes = 50x300. 50 indicates each neuron and 300
+% indicates 3 input words for a mini-batch sample of 100 training data.
+
+% embedding_layer_state = reshape(A, r, c), 
+% A-> Array to reshape, r-> number of rows, c->number of columns 
 embedding_layer_state = reshape(...
-  word_embedding_weights(reshape(input_batch, 1, []),:)', numhid1 * numwords, []);
+  word_embedding_weights(reshape(input_batch, 1, []),:)', ...
+  numhid1 * numwords, ...
+  []);
 
 %% COMPUTE STATE OF HIDDEN LAYER.
 % Compute inputs to hidden units.
 inputs_to_hidden_units = embed_to_hid_weights' * embedding_layer_state + ...
   repmat(hid_bias, 1, batchsize);
 
+  
+% Computing the state of each layer in the netowork.  
+  
 % Apply logistic activation function.
 % FILL IN CODE. Replace the line below by one of the options.
-#hidden_layer_state = zeros(numhid2, batchsize);
-hidden_layer_state = 1 ./ (1 + exp(-inputs_to_hidden_units))  # Using Sigmoid
+%hidden_layer_state = zeros(numhid2, batchsize);
+hidden_layer_state = 1 ./ (1 + exp(-inputs_to_hidden_units))  % Using Sigmoid
 % Options
 % (a) hidden_layer_state = 1 ./ (1 + exp(inputs_to_hidden_units));
 % (b) hidden_layer_state = 1 ./ (1 - exp(-inputs_to_hidden_units));
 % (c) hidden_layer_state = 1 ./ (1 + exp(-inputs_to_hidden_units));
 % (d) hidden_layer_state = -1 ./ (1 + exp(-inputs_to_hidden_units));
 
+
 %% COMPUTE STATE OF OUTPUT LAYER.
 % Compute inputs to softmax.
 % FILL IN CODE. Replace the line below by one of the options.
-#inputs_to_softmax = zeros(vocab_size, batchsize);
-inputs_to_softmax = hid_to_output_weights' * hidden_layer_state +  repmat(output_bias, 1, batchsize);
+%inputs_to_softmax = zeros(vocab_size, batchsize);
+inputs_to_softmax = hid_to_output_weights' * hidden_layer_state +  ...
+    repmat(output_bias, 1, batchsize);
 
 % Options
 % (a) inputs_to_softmax = hid_to_output_weights' * hidden_layer_state +  repmat(output_bias, 1, batchsize);
@@ -78,13 +96,19 @@ inputs_to_softmax = hid_to_output_weights' * hidden_layer_state +  repmat(output
 inputs_to_softmax = inputs_to_softmax...
   - repmat(max(inputs_to_softmax), vocab_size, 1);
 
-% Compute exp.
+% Compute exp.  Using Softmax Function - exponent
+% Overall formula : exp(input)/sum(exp(input))
 output_layer_state = exp(inputs_to_softmax);
-
 % Normalize to get probability distribution.
 output_layer_state = output_layer_state ./ repmat(...
   sum(output_layer_state, 1), vocab_size, 1);
   
-  
- # My Theory
- #The file contains basically five compuation.
+% About the repmat function: repmat(A,2,3) 
+% where A is the value, 2 is the number of rows and 3 is the number of columns.
+% In the above case:
+%     sum(output_layer_state, 1) will produce an arrayfun
+%     vocab_size is the size of vocabulary which is 250
+%     1 is the number of colums
+
+% My Theory
+% The file contains basically five compuation.

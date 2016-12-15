@@ -32,12 +32,12 @@ show_validation_CE_after = 1000;
 % Train input 
 [train_input, train_target, valid_input, valid_target, ...
   test_input, test_target, vocab] = load_data(batchsize);
-disp 'The size of traiing data is: ',size(train_input)
-disp 'The size of Rcrossvalid target is: ',size(train_target)
-disp 'The size of crossvalid data is: ',size(valid_input)
-disp 'The size of crossvalid target is: ',size(valid_target)
-disp 'The size of test data is: ',size(test_input)
-disp 'The size of test target is: ',size(test_target)
+%disp 'The size of traiing data is: ',size(train_input)
+%disp 'The size of Rcrossvalid target is: ',size(train_target)
+%disp 'The size of crossvalid data is: ',size(valid_input)
+%disp 'The size of crossvalid target is: ',size(valid_target)
+%disp 'The size of test data is: ',size(test_input)
+%disp 'The size of test target is: ',size(test_target)
 [numwords, batchsize, numbatches] = size(train_input); 
 vocab_size = size(vocab, 2);
 
@@ -119,9 +119,9 @@ for epoch = 1:epochs
     count =  count + 1;
     this_chunk_CE = this_chunk_CE + (CE - this_chunk_CE) / count;
     trainset_CE = trainset_CE + (CE - trainset_CE) / m;
-    fprintf(1, '\rBatch %d Train CE %.3f', m, this_chunk_CE);
+    %fprintf(1, '\rBatch %d Train CE %.3f', m, this_chunk_CE);
     if mod(m, show_training_CE_after) == 0
-      fprintf(1, '\n');
+      %fprintf(1, '\n');
       count = 0;
       this_chunk_CE = 0;
     end
@@ -159,7 +159,7 @@ for epoch = 1:epochs
     % FILL IN CODE. Replace the line below by one of the options.
     % back_propagated_deriv_2 = zeros(numhid2, batchsize);
     back_propagated_deriv_2 = ...
-        back_propagated_deriv_1 * embed_to_hid_weights'
+        embed_to_hid_weights * back_propagated_deriv_1;
     % Options
     % (a) back_propagated_deriv_2 = embed_to_hid_weights * back_propagated_deriv_1;
     % (b) back_propagated_deriv_2 = back_propagated_deriv_1 * embed_to_hid_weights;

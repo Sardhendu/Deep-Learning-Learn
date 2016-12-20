@@ -130,6 +130,9 @@ Weights of each word in the vocabulary to each neuron
 	--> The state of the input layer is just the sigmoid function of the sum of squared error 
 
 # inputs_to_softmax :
+    inputs_to_softmax = np.dot(np.transpose(hid_to_outpt_wghts), hid_layer_state) + np.tile(outpt_bias, (1,batch_size))
+    The same Formula of sum of squared error.
+    
 	# Subtract maximum. 
 	# Remember that adding or subtracting the same constant from each input to a
 	# softmax unit does not affect the outputs. Here we are subtracting maximum to

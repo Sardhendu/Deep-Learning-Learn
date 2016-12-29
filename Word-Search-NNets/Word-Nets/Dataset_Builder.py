@@ -34,7 +34,9 @@ content_replacements = [
     {'pattern': 'Source text', 'repl':''}
     ]
 
-path = '/Users/sam/All-Program/App-DataSet/Deep-Neural-Nets/Word-Search-NNets/articles_json.json'
+path = '/Users/sam/All-Program/App-DataSet/Deep-Neural-Nets/Word-Search-NNets/Word-Nets/articles_json.json'
+dictionary_dir = '/Users/sam/All-Program/App-DataSet/Deep-Neural-Nets/Word-Search-NNets/Word-Nets/dictionary.txt'
+corpora_dir = '/Users/sam/All-Program/App-DataSet/Deep-Neural-Nets/Word-Search-NNets/Word-Nets/corpus.pickle'
 
 
 # print (articles.keys())
@@ -115,11 +117,6 @@ class ProcessTxtGetTerm():
 #==============================================================================
 # Get Terms and Bulk Load    
 #==============================================================================
-dictionary_dir = '/Users/sam/All-Program/App-DataSet/Deep-Neural-Nets/Word-Search-NNets/dictionary.txt'
-corpora_dir = '/Users/sam/All-Program/App-DataSet/Deep-Neural-Nets/Word-Search-NNets/corpus.pickle'
-doc_name_id_dir = '/Users/sam/All-Program/App-DataSet/Deep-Neural-Nets/Word-Search-NNets/doc_name_id.json'
-
-# dictionary_dir = '/Users/sam/All-Program/App-DataSet/Deep-Neural-Nets/dictionary.txt'
 
 class BlkTerm_ExtStrTask():
 
@@ -168,7 +165,7 @@ class BlkTerm_ExtStrTask():
         #  We compactify the dictionary (We remove the terms that occurs only once)
         dictionary = corpora.Dictionary.load_from_text(dictionary_dir)
         print ('BuildCorpus (Bulk)!! The length of complete dictionary is : ', len(dictionary))
-        ids_occur_once = [tokenid for tokenid, docfreq in dictionary.dfs.items() if docfreq == 1]
+        ids_occur_once = [tokenid for tokenid, docfreq in dictionary.dfs.items() if docfreq in [1,2,3]]
         print (len(ids_occur_once))
         dictionary.filter_tokens(ids_occur_once)
         print ('BuildCorpus (Bulk)!! The length of terms that occur only ones is: ', len(ids_occur_once))
@@ -190,7 +187,7 @@ class BlkTerm_ExtStrTask():
         
         k = 1
         for docID, doc in articles.items():   # e196741c-dc63-3534-90ec-e35ec5ff5e17
-            if k > 0 and k <= 2:# no_of_docs:
+            if k > 0 and k <=  no_of_docs:
                 print ('BuildCorpus (Bulk)!! Document number is: ', k)
 
                 print ('BuildCorpus (Bulk)!! The docID is: ', docID)
@@ -220,9 +217,9 @@ class BlkTerm_ExtStrTask():
         print ('The word corpus can be found at %s ' %corpora_dir)
 
 
-BlkTerm_ExtStrTask().create_dictionary(no_of_docs = 2000, bulk_doc_no = 1000)
-# BlkTerm_ExtStrTask().create_corpus(no_of_docs = 2000)
+# BlkTerm_ExtStrTask().create_dictionary(no_of_docs = 2000, bulk_doc_no = 1000)
+BlkTerm_ExtStrTask().create_corpus(no_of_docs = 2000)
 
 # A = pickle.load(open(corpora_dir, "rb" ))
-# print (A)
+# print (A[1:3])
 

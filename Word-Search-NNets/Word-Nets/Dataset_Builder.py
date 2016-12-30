@@ -37,6 +37,10 @@ content_replacements = [
 path = '/Users/sam/All-Program/App-DataSet/Deep-Neural-Nets/Word-Search-NNets/Word-Nets/articles_json.json'
 dictionary_dir = '/Users/sam/All-Program/App-DataSet/Deep-Neural-Nets/Word-Search-NNets/Word-Nets/dictionary.txt'
 corpora_dir = '/Users/sam/All-Program/App-DataSet/Deep-Neural-Nets/Word-Search-NNets/Word-Nets/corpus.pickle'
+train_batch_dir = '/Users/sam/All-Program/App-DataSet/Deep-Neural-Nets/Word-Search-NNets/Word-Nets/training_batch/'
+test_batch_dir = '/Users/sam/All-Program/App-DataSet/Deep-Neural-Nets/Word-Search-NNets/Word-Nets/test_batch/'
+valid_batch_dir = '/Users/sam/All-Program/App-DataSet/Deep-Neural-Nets/Word-Search-NNets/Word-Nets/crossvalid_batch/'
+
 
 
 # print (articles.keys())
@@ -95,8 +99,9 @@ class ProcessTxtGetTerm():
         return sent_arr_nw
 
 
-    def get_processed_sent(sent, txt):
-        # print 'DUDE!!! INITIATING NEW TEXT EXTRACTION...............................................................'
+    def get_processed_sent(self, txt):
+        # PARSES THE DOCUMENT, CONSTRUCT SENTENCES, EXTRACT TOKENS, REBUILD SENTENCES
+        # REURNS A DOC AS SENTENCE ARRAY WITH SEPARATED TOKENS
         ent_trm = []
         date_trm = []
       
@@ -145,9 +150,10 @@ class BlkTerm_ExtStrTask():
                     sent_arr_nw  =   ProcessTxtGetTerm().get_processed_sent(doc)
 
                     for arr_nw in sent_arr_nw:
+                        # print (arr_nw)
                         dictionary_doc = corpora.Dictionary([arr_nw])
                         dictionary.merge_with(dictionary_doc)  # Merge the new dictionary with the existing
-
+                    # break
                     if (k%bulk_doc_no == 0): # 4000
                         print ('BuildCorpus (Bulk)!! Inside the if condition, the value of k is: ', k)
                         dictionary.save_as_text(dictionary_dir)
@@ -171,6 +177,9 @@ class BlkTerm_ExtStrTask():
         print ('BuildCorpus (Bulk)!! The length of terms that occur only ones is: ', len(ids_occur_once))
         dictionary.compactify()
         print ('BuildCorpus (Bulk)!! The length of compactified dictionay is: ', len(dictionary))
+
+        # Fianally We Add the START, END and UNKNOWN Tokens 
+        dictionary.merge_with(corpora.Dictionary([["START_TOKEN", "END_TOKEN", "UNK_TOKEN"]]))
         dictionary.save_as_text(dictionary_dir)
 
 
@@ -194,15 +203,15 @@ class BlkTerm_ExtStrTask():
 
                 sent_arr_nw  =   ProcessTxtGetTerm().get_processed_sent(doc)
                 for sent_arr in sent_arr_nw:
-                    arr = [dictionary_size]
+                    arr = [dictionary.token2id["START_TOKEN"]]
                     # print (sent_arr)
                     for token in sent_arr:
                         try:
                             arr.append(dictionary.token2id[token])
                         except KeyError:
                             # print ('pepepepepepep')
-                            arr.append(dictionary_size+2)
-                    arr += [dictionary_size+1]
+                            arr.append(dictionary.token2id["UNK_TOKEN"])
+                    arr += [dictionary.token2id["END_TOKEN"]]
                     # print (arr)
                     corpus_newdoc.append(arr)
 
@@ -217,9 +226,102 @@ class BlkTerm_ExtStrTask():
         print ('The word corpus can be found at %s ' %corpora_dir)
 
 
+class CreateBatches():
+    def __init__(self):
+
+        self.dictionary = corpora.Dictionary.load_from_text(dictionary_dir)
+
+    def chunks(self, data_in, batch_size):
+        """Yield successive n-sized chunks from l."""
+        for i in range(0, len(data_in), batch_size):
+            yield data_in[i:i + batch_size]
+        
+    # For one batch_element : [1,2,3,4], batch_dataset for that element is [1,2,3] and batch_label is [2,3,4]
+    def batch_data_and_labels(self, batch):
+        batch_dataset = []
+        batch_labels = []
+        batch_lenarr = []   # We need the lenght of every row in batch to help RNN (Recurrent network) for learning
+        for array in batch:
+            array_nw = [j+1 for j in array] # We add 1 because we perform padding of 0 to the data set in RNN model and our dictionary contains the ID (0), hence we add all the element with 1. so that all the 0 changes to 1 and the zero padding doesnt effect the overall cost calculation in RNN
+            batch_dataset.append(array_nw[0:len(array_nw)-1])
+            batch_labels.append(array_nw[1:len(array_nw)])
+            batch_lenarr.append(len(array_nw)-1)
+        return batch_dataset, batch_labels, batch_lenarr
+
+    def create_batches(self, data_in, batch_size):
+        for batch in self.chunks(data_in, batch_size):
+            batch_dataset, batch_labels, batch_lenarr = self.batch_data_and_labels(batch)
+            yield batch_dataset, batch_labels, batch_lenarr
+
+    # THe below function creates the batches for the training, crossvalid and test data
+    # Also it creates the labels for each sentence
+    def create_train_valid_test_batch(self, prcntg_test_valid, batch_size):
+        with open(corpora_dir, 'rb') as f:
+            dataset = pickle.load(f)
+            if (len(dataset) > 5000):
+                np.random.shuffle(dataset)
+                test_len = int(np.ceil(len(dataset) * (prcntg_test_valid/100)))
+                test_data = dataset[0:test_len]
+                valid_data = dataset[test_len:test_len+test_len]
+                train_data = dataset[test_len+test_len:len(dataset)]
+                print (len(test_data), len(valid_data), len(train_data))
+                np.random.shuffle(train_data)
+                
+                try:
+                    for no, (batch_dataset, batch_labels, batch_lenarr) in enumerate(self.create_batches(train_data, batch_size)):
+                        with open(train_batch_dir+'batch'+str(no)+'.pickle', 'wb') as f:
+                            batch = {
+                                'batch_train_dataset': batch_dataset,
+                                'batch_train_labels': batch_labels,
+                                'batch_train_lenarr': batch_lenarr
+                            }
+                            pickle.dump(batch, f, pickle.HIGHEST_PROTOCOL)
+
+                    for no, (batch_dataset, batch_labels, batch_lenarr) in enumerate(self.create_batches(valid_data, batch_size)):
+                        with open(valid_batch_dir+'batch'+str(no)+'.pickle', 'wb') as f:
+                            batch = {
+                                'batch_valid_dataset': batch_dataset,
+                                'batch_valid_labels': batch_labels,
+                                'batch_valid_lenarr': batch_lenarr
+                            }
+                            pickle.dump(batch, f, pickle.HIGHEST_PROTOCOL)
+
+                    for no, (batch_dataset, batch_labels, batch_lenarr) in enumerate(self.create_batches(test_data, batch_size)):
+                        with open(test_batch_dir+'batch'+str(no)+'.pickle', 'wb') as f:
+                            batch = {
+                                'batch_test_dataset': batch_dataset,
+                                'batch_test_labels': batch_labels,
+                                'batch_test_lenarr': batch_lenarr
+                            }
+                            pickle.dump(batch, f, pickle.HIGHEST_PROTOCOL)
+                except Exception as e:
+                    print('Unable to save data to any one of the train, test or valid dir', e)
+                    raise
+                    
+            else:
+                print ("There's not much Data, We Demand Atleast more that 5000")
+
+
+
 # BlkTerm_ExtStrTask().create_dictionary(no_of_docs = 2000, bulk_doc_no = 1000)
-BlkTerm_ExtStrTask().create_corpus(no_of_docs = 2000)
+# BlkTerm_ExtStrTask().create_corpus(no_of_docs = 2000)
+# CreateBatches().create_train_valid_test_batch(prcntg_test_valid = 20, batch_size = 256)
 
-# A = pickle.load(open(corpora_dir, "rb" ))
-# print (A[1:3])
 
+
+
+
+################################  DUMMY TRY  ################################
+
+# data_in = [[1,2,3,4],[2,3,4,5], [1,2,3,4,5,6], [4,3,5], [3,4,5,6,7,8,8], [3,3,3,3,4,5,5,6]]
+# for no, (a,b,c) in enumerate(CreateBatches().create_batches(data_in, 2)):
+#     print (no)
+#     print (a)
+#     print (b)
+#     print (c)
+#     print ('')
+
+
+# with open(train_batch_dir+'batch'+str(1)+'.pickle', 'rb') as f:
+#     a = pickle.load(f)
+#     print (a)

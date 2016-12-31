@@ -237,20 +237,22 @@ class CreateBatches():
             yield data_in[i:i + batch_size]
         
     # For one batch_element : [1,2,3,4], batch_dataset for that element is [1,2,3] and batch_label is [2,3,4]
-    def batch_data_and_labels(self, batch):
+    def pad_data_and_labels(self, batch):
         batch_dataset = []
         batch_labels = []
         batch_lenarr = []   # We need the lenght of every row in batch to help RNN (Recurrent network) for learning
+        maxlen = len(max(batch,key=len))  # Find the length of the sublist with highest elements
         for array in batch:
-            array_nw = [j+1 for j in array] # We add 1 because we perform padding of 0 to the data set in RNN model and our dictionary contains the ID (0), hence we add all the element with 1. so that all the 0 changes to 1 and the zero padding doesnt effect the overall cost calculation in RNN
-            batch_dataset.append(array_nw[0:len(array_nw)-1])
-            batch_labels.append(array_nw[1:len(array_nw)])
-            batch_lenarr.append(len(array_nw)-1)
-        return batch_dataset, batch_labels, batch_lenarr
+            # In the below code we add 1 because we perform padding of 0 to each array in  and our dictionary contains the ID (0), hence we add all the element with 1. so that all the 0 changes to 1 and the zero padding doesnt effect the model we build
+            # np.pad(array)
+            batch_dataset.append(np.pad(np.add(array[0:len(array)-1], 1), (0,maxlen-len(array)), mode='constant'))
+            batch_labels.append(np.pad(np.add(array[1:len(array)], 1), (0,maxlen-len(array)), mode='constant'))
+            batch_lenarr.append(len(array)-1)
+        return np.vstack(batch_dataset), np.vstack(batch_labels), batch_lenarr
 
     def create_batches(self, data_in, batch_size):
         for batch in self.chunks(data_in, batch_size):
-            batch_dataset, batch_labels, batch_lenarr = self.batch_data_and_labels(batch)
+            batch_dataset, batch_labels, batch_lenarr = self.pad_data_and_labels(batch)
             yield batch_dataset, batch_labels, batch_lenarr
 
     # THe below function creates the batches for the training, crossvalid and test data
@@ -313,7 +315,7 @@ class CreateBatches():
 
 ################################  DUMMY TRY  ################################
 
-# data_in = [[1,2,3,4],[2,3,4,5], [1,2,3,4,5,6], [4,3,5], [3,4,5,6,7,8,8], [3,3,3,3,4,5,5,6]]
+# data_in = [[1,2,3,4],[2,3,4,5,6,7], [1,2,3,4,5,6], [4,3,5], [3,4,5,6,7,8,8], [3,3,3,3,4,5,5,6]]
 # for no, (a,b,c) in enumerate(CreateBatches().create_batches(data_in, 2)):
 #     print (no)
 #     print (a)

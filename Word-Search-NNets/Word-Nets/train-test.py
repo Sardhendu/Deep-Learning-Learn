@@ -44,7 +44,7 @@ class Train():
                 new_hid_layer_state = None
                 print (graph_dict)
 
-                for no in np.arange(2):#[[aa,bb],[cc,dd]]:#np.arange(2):
+                for no in np.arange(10):#[[aa,bb],[cc,dd]]:#np.arange(2):
                     with open(self.train_batch_dir+'batch'+str(no)+'.pickle', 'rb') as f:
                         dataset = pickle.load(f)
                         
@@ -79,8 +79,8 @@ class Train():
                         # print ('')
                         # print ('optimizer \n', opt)
                         # print ('')
-                        print ('training_prediction \n', tp)
-                        print ('')
+                        # print ('training_prediction \n', tp)
+                        # print ('')
                         print ('accuracy \n', acc)
                         print ('')
                         print ('')

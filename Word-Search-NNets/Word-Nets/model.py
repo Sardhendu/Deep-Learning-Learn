@@ -18,7 +18,7 @@ def reset_graph():  # Reset the graph
 
 # vacab_size = 6
 def dynamic_RNN_model(
-    num_hid_units = 3,
+    num_hid_units = 100,
     vocab_size = 7,
     momentum = 0.9,
     learning_rate = 0.01

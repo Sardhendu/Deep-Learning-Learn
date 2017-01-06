@@ -307,7 +307,7 @@ class CreateBatches():
 
 # BlkTerm_ExtStrTask().create_dictionary(no_of_docs = 2000, bulk_doc_no = 1000)
 # BlkTerm_ExtStrTask().create_corpus(no_of_docs = 2000)
-# CreateBatches().create_train_valid_test_batch(prcntg_test_valid = 20, batch_size = 128)
+CreateBatches().create_train_valid_test_batch(prcntg_test_valid = 10, batch_size = 64)
 
 
 

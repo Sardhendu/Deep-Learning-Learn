@@ -21,7 +21,7 @@ def dynamic_RNN_model(
     num_hid_units = 3,
     vocab_size = 7,
     momentum = 0.9,
-    learning_rate = 0.001
+    learning_rate = 0.1
     ):
     print ('The num of hidden unit is: ', num_hid_units)
     print ('The Vocab size is: ', vocab_size)
@@ -71,25 +71,22 @@ def dynamic_RNN_model(
     output_state = tf.nn.softmax(hid_to_ouptut_layer, name=None)
  
     
-    # CALCULATING LOSS, OPTIMIZING THE COST FUNCTION, MEASURING ACCURACY
+    # CALCULATING LOSS
     y_reshaped = tf.reshape(y, [-1])
     softmax_opt = tf.nn.sparse_softmax_cross_entropy_with_logits(hid_to_ouptut_layer, y_reshaped)
     loss_CE = tf.reduce_mean(softmax_opt)
     
-    # # MASK THE LOSES
+
+    # MASK THE LOSES
     mask = tf.sign(tf.to_float(y_reshaped))  
     masked_loss = mask * loss_CE
- 
-    # # Bring back to [B, T] shape
     masked_loss = tf.reshape(masked_loss,  tf.shape(y))
-
-    # # Calculate mean loss
     mean_loss_by_example = tf.reduce_sum(masked_loss, reduction_indices=1) / x_lenarr
     mean_loss = tf.reduce_mean(mean_loss_by_example)
 
     # The sparse_softmax uses dtype as int32 or int64
 
-    # OPTIMIZE
+    # OPTIMIZING THE COST FUNCTION
     optimizer = tf.train.AdamOptimizer(learning_rate).minimize(loss_CE)
 #     optimizer = tf.train.MomentumOptimizer(learning_rate, 
 #                                             momentum, 
@@ -116,22 +113,5 @@ def dynamic_RNN_model(
         mean_loss_by_example = mean_loss_by_example,
         mean_loss = mean_loss,
         optimizer = optimizer,
-        training_prediction = output_state
+        prediction = output_state
     )
-
-# Model()
-    
-"""
-Notes:
-    1. embed_to_hid_wghts = tf.get_variable('embedding_matrix', [vocab_size, num_hid_units]):
-       embed_to_hid_layer = tf.nn.embedding_lookup(embed_to_hid_wghts, x)
-        # Normally we convert the input vector into a one hot matrix and then multiply it to the embedded weights, When we do so, we get the same embed weight corresponding to 1's in the one-hot vector but in a different shape. The above operation does all that in a single shot. Basically, embed_to_hid_wghts defines a matrix with weights going form all vacab to hiddenunits,and embed_to_hid_layer pulls the vectors from embedding_matrix(embed_to_hid_wghts) corresponding to the idices entries of x for all the batch. So the matrix embed_to_hid_layer = [batch_size x num_sequences x num_hid_units]
-
-    2. The variable rnn_output is a Tensor of shape of [Batch_size x num_sequence x num_hid_units] and,
-       The hid_to_output_wght is in the shape of [num_hid_units x num_classes]
-       And We want an output with shape [Batch_size x num_sequence x num_classes]
-       We horizontlly stack all the batches to form a matrix of [(Batch_size x num_sequence]) x num_classes]
-
-    3. sparse_softmax_cross_entropy_with_logits automatically converts the y's into on hot vectors and perform 
-       the softmax operation When using softmax_cross_entropy_with_logits, we have to first convert the y's into one-hot vector
-"""

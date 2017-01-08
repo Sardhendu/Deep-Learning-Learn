@@ -264,9 +264,11 @@ class CreateBatches():
                 np.random.shuffle(dataset)
                 test_len = int(np.ceil(len(dataset) * (prcntg_test_valid/100)))
                 test_data = dataset[0:test_len]
-                valid_data = dataset[test_len:test_len+test_len]
-                train_data = dataset[test_len+test_len:len(dataset)]
-                print (len(test_data), len(valid_data), len(train_data))
+                valid_data = dataset[test_len:int(np.ceil(test_len+test_len/2))]
+                train_data = dataset[int(np.ceil(test_len+test_len/2)):len(dataset)]
+                print ('Test data size = ', len(test_data))
+                print ('Valid data size = ', len(valid_data))
+                print ('Training data size = ', len(train_data))
                 np.random.shuffle(train_data)
                 
                 try:

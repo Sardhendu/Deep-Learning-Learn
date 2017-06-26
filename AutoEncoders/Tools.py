@@ -94,7 +94,8 @@ class SparseAutoEncoders():
         # Each Neuron's output is dot product of weights and input. So here we average the activation (hidden state)
         # of each neuron.
         rho_hat = np.sum(hidLayerState, axis=0) / input.shape[1]
-        logging.info('The Average activation shape (equals the number of Neurons) is: %s %s', rho_hat.shape, rho_hat)
+        logging.info('The Average activation (rho_hat) shape (equals the number of Neurons) is: %s %s', rho_hat.shape,
+                     rho_hat)
         rho = np.tile(self.rho, numHidUnits)
         divergence = klDivergence(rho, rho_hat)
         print (divergence)
@@ -109,8 +110,11 @@ class SparseAutoEncoders():
         print (cost)
         
         
-        # Backward Propagation
-        row_delta =
+        # Backward Propagation The derivate term for rho_hat
+        row_delta = np.tile(
+                (- rho / rho_hat + (1 - rho) / (1 - rho_hat)),
+                (input.shape[1], 1)
+        )
         
         
 b = SparseAutoEncoders(numInpUnits = 3,

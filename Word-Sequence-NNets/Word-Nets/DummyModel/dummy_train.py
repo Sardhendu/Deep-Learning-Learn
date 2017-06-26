@@ -161,9 +161,10 @@ def print_output(x_, y_, x_lenarr_, batch_size_, init_state_, new_state_, rnn_ou
     print ('')
     print ('')
 
-obj_Train = Train()
-graph_dict =  dynamic_RNN_model(vocab_size = 7)
-obj_Train.train_network(graph_dict)
+# obj_Train = Train()
+# graph_dict =  dynamic_RNN_model(vocab_size = 7)
+# obj_Train.train_network(graph_dict)
+
 
         
 # obj_Train = Train()

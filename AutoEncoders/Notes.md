@@ -11,3 +11,6 @@ Sum Squared:
 Weight Decay
 
 KL Divergence: 
+
+
+

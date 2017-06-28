@@ -67,7 +67,7 @@ class SparseAutoEncoders():
         a = NetworkDesign(numInpUnits=numInpUnits,
                           numHidUnits=numHidUnits,
                           numOutUnits=numOutUnits,
-                          )
+                        )
 
         a.initBias()
         a.initWeights()
@@ -82,7 +82,9 @@ class SparseAutoEncoders():
         logging.info('The shape of the hidden to output weights is: %s', W2.shape)
         logging.info('The shape of the hidden to output bias is: %s', b2.shape)
         
-        hidLayerState = sigmoid(np.dot(input, W1) + b1)
+        hidLayerState = sigmoid(
+                np.dot(input, W1) + b1
+        )
         logging.info('The shape of the hidden layer state is: %s', hidLayerState.shape)
 
         outLayerState = sigmoid(
@@ -110,11 +112,13 @@ class SparseAutoEncoders():
         print (cost)
         
         
-        # Backward Propagation The derivate term for rho_hat
+        # Backward Propagation The derivate term for rho_hat, The below is just the derivative term repeated
         row_delta = np.tile(
                 (- rho / rho_hat + (1 - rho) / (1 - rho_hat)),
                 (input.shape[1], 1)
         )
+        
+        
         
         
 b = SparseAutoEncoders(numInpUnits = 3,

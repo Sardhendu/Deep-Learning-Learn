@@ -1,8 +1,10 @@
-2017-06-26 23:25:48,501 INFO     The shape of the input is: (1, 3)
-2017-06-26 23:25:48,502 INFO     The shape of the input to hidden weights is: (3, 2)
-2017-06-26 23:25:48,502 INFO     The shape of the input to hidden bias is: (1, 2)
-2017-06-26 23:25:48,502 INFO     The shape of the hidden to output weights is: (2, 3)
-2017-06-26 23:25:48,502 INFO     The shape of the hidden to output bias is: (1, 3)
-2017-06-26 23:25:48,511 INFO     The shape of the hidden layer state is: (1, 2)
-2017-06-26 23:25:48,511 INFO     The shape of the output layer state is: (1, 3)
-2017-06-26 23:25:48,511 INFO     The Average activation (rho_hat) shape (equals the number of Neurons) is: (2,) [ 0.14737631  0.04860582]
+2017-06-29 22:27:43,729 INFO     The shape of the input is: (1, 3)
+2017-06-29 22:27:43,729 INFO     The shape of the input to hidden weights is: (3, 2)
+2017-06-29 22:27:43,730 INFO     The shape of the input to hidden bias is: (1, 2)
+2017-06-29 22:27:43,730 INFO     The shape of the hidden to output weights is: (2, 3)
+2017-06-29 22:27:43,730 INFO     The shape of the hidden to output bias is: (1, 3)
+2017-06-29 22:27:43,738 INFO     The shape of the hidden layer state is: (1, 2)
+2017-06-29 22:27:43,738 INFO     The shape of the output layer state is: (1, 3)
+2017-06-29 22:27:43,738 INFO     The Average activation (rho_hat) shape (equals the number of Neurons) is: (2,) [ 0.14737631  0.04860582]
+2017-06-29 22:27:43,739 INFO     The reg is: () 2.12505390527
+2017-06-29 22:27:43,739 INFO     The rho_delta shape is: (3, 2)

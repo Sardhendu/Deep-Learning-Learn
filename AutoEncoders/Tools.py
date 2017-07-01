@@ -71,24 +71,24 @@ class SparseAutoEncoders():
 
         a.initBias()
         a.initWeights()
-        W1 = a.params['w'][0]
-        W2 = a.params['w'][1]
-        b1 = a.params['b'][0]
-        b2 = a.params['b'][1]
+        inp_to_hid_wghts = a.params['w'][0]
+        hid_to_out_wghts = a.params['w'][1]
+        inp_to_hid_bias = a.params['b'][0]
+        hid_to_out_bias = a.params['b'][1]
 
         
-        logging.info('The shape of the input to hidden weights is: %s', W1.shape)
-        logging.info('The shape of the input to hidden bias is: %s', b1.shape)
-        logging.info('The shape of the hidden to output weights is: %s', W2.shape)
-        logging.info('The shape of the hidden to output bias is: %s', b2.shape)
+        logging.info('The shape of the input to hidden weights is: %s', inp_to_hid_wghts.shape)
+        logging.info('The shape of the input to hidden bias is: %s', inp_to_hid_bias.shape)
+        logging.info('The shape of the hidden to output weights is: %s', hid_to_out_wghts.shape)
+        logging.info('The shape of the hidden to output bias is: %s', hid_to_out_bias.shape)
         
         hidLayerState = sigmoid(
-                np.dot(input, W1) + b1
+                np.dot(input, inp_to_hid_wghts) + inp_to_hid_bias
         )
         logging.info('The shape of the hidden layer state is: %s', hidLayerState.shape)
 
         outLayerState = sigmoid(
-                np.dot(hidLayerState, W2) + b2
+                np.dot(hidLayerState, hid_to_out_wghts) + hid_to_out_bias
         )
         logging.info('The shape of the output layer state is: %s', outLayerState.shape)
         
@@ -100,23 +100,33 @@ class SparseAutoEncoders():
                      rho_hat)
         rho = np.tile(self.rho, numHidUnits)
         divergence = klDivergence(rho, rho_hat)
-        print (divergence)
+        print ('divergence for each hidden units: \n', divergence)
+        
+        # Compute the regularization parameter
+        reg = np.sum(inp_to_hid_wghts**2) + np.sum(hid_to_out_wghts**2)
+        logging.info('The reg is: %s %s', reg.shape, reg)
         
         # Compute the cost function (minimum squared error)
         # In Auto-Encoders the input is the output, we just use the hidden layer to learn interesting representation
         # or weights for latent factors
         cost = (1/2*input.shape[1]) * pow(np.sum(outLayerState - input), 2) + \
-               ((self.lambda_/2) * (np.sum(W1**2) + np.sum(W2**2))) + \
+               ((self.lambda_/2) * reg) + \
                (self.beta * np.sum(divergence))
         
-        print (cost)
+        print ('cost: \n', cost)
         
         
         # Backward Propagation The derivate term for rho_hat, The below is just the derivative term repeated
-        row_delta = np.tile(
-                (- rho / rho_hat + (1 - rho) / (1 - rho_hat)),
+        rho_delta = np.tile(
+                (- rho / rho_hat + (1 - rho) / (1 - rho_hat)),   # This is the derivative (gradient) of rho
                 (input.shape[1], 1)
         )
+        logging.info('The rho_delta shape is: %s', rho_delta.shape)
+        print ('rho_delta: \n', rho_delta)
+        
+        derv_1 = -(input - outLayerState)
+        derv_2 = sigmoid(outLayerState) * (1 - sigmoid(outLayerState))
+        # hid_to_out_delta =  *
         
         
         

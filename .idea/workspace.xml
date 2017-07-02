@@ -1,13 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="ee2a029f-7072-40ab-968e-ea19299dfce2" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/AutoEncoders/.ipynb_checkpoints/MathEquations-checkpoint.ipynb" afterPath="$PROJECT_DIR$/AutoEncoders/.ipynb_checkpoints/MathEquations-checkpoint.ipynb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/AutoEncoders/MathEquations.ipynb" afterPath="$PROJECT_DIR$/AutoEncoders/MathEquations.ipynb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/AutoEncoders/Tools.py" afterPath="$PROJECT_DIR$/AutoEncoders/Tools.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/AutoEncoders/logfile" afterPath="$PROJECT_DIR$/AutoEncoders/logfile" />
-    </list>
+    <list default="true" id="ee2a029f-7072-40ab-968e-ea19299dfce2" name="Default" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />

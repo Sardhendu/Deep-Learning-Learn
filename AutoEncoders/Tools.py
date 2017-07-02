@@ -60,7 +60,7 @@ class SparseAutoEncoders():
         numInpUnits = self.numInpUnits
         numHidUnits = self.numHidUnits
         numOutUnits = self.numOutUnits
-        
+        m,n = input.shape
         
         logging.info('The shape of the input is: %s', input.shape)
         print ('The input is: ', input)
@@ -87,15 +87,14 @@ class SparseAutoEncoders():
         )
         logging.info('The shape of the hidden layer state is: %s', hidLayerState.shape)
 
-        outLayerState = sigmoid(
-                np.dot(hidLayerState, hid_to_out_wghts) + hid_to_out_bias
-        )
+        # We dont use the sigmoid activation for the output unit,since we are training an Autoencoder.
+        outLayerState = np.dot(hidLayerState, hid_to_out_wghts) + hid_to_out_bias
         logging.info('The shape of the output layer state is: %s', outLayerState.shape)
         
         # Compute the average activation rho_hat
         # Each Neuron's output is dot product of weights and input. So here we average the activation (hidden state)
         # of each neuron.
-        rho_hat = np.sum(hidLayerState, axis=0) / input.shape[1]
+        rho_hat = np.sum(hidLayerState, axis=0) / m
         logging.info('The Average activation (rho_hat) shape (equals the number of Neurons) is: %s %s', rho_hat.shape,
                      rho_hat)
         rho = np.tile(self.rho, numHidUnits)
@@ -109,29 +108,46 @@ class SparseAutoEncoders():
         # Compute the cost function (minimum squared error)
         # In Auto-Encoders the input is the output, we just use the hidden layer to learn interesting representation
         # or weights for latent factors
-        cost = (1/2*input.shape[1]) * pow(np.sum(outLayerState - input), 2) + \
+        cost = (1/2*m) * pow(np.sum(outLayerState - input), 2) + \
                ((self.lambda_/2) * reg) + \
                (self.beta * np.sum(divergence))
         
         print ('cost: \n', cost)
         
         
-        # Backward Propagation The derivate term for rho_hat, The below is just the derivative term repeated
-        rho_delta = np.tile(
+        # Backward Propagation The derivate term for divergence, The below is just the derivative term repeated
+        delta_rho = np.tile(
                 (- rho / rho_hat + (1 - rho) / (1 - rho_hat)),   # This is the derivative (gradient) of rho
-                (input.shape[1], 1)
+                (m, 1)
         )
-        logging.info('The rho_delta shape is: %s', rho_delta.shape)
-        print ('rho_delta: \n', rho_delta)
-        
-        derv_1 = -(input - outLayerState)
-        derv_2 = sigmoid(outLayerState) * (1 - sigmoid(outLayerState))
-        # hid_to_out_delta =  *
+        logging.info('The shape of delta_rhois: %s', delta_rho.shape)
+        print ('rho_delta: \n', delta_rho)
         
         
+        # Compute the gradients for the Output state and hidden state
+        delta_outLayer = -(input - outLayerState)
+        logging.info('The shape of delta_outLayer is: %s', delta_outLayer.shape)
+        delta_hidLayer = (np.dot(delta_outLayer, np.transpose(hid_to_out_wghts)) + \
+                          + self.beta * delta_rho
+                          )* sigmoid(hidLayerState) * (1 - sigmoid(hidLayerState))
+        logging.info('The shape of delta_hidLayer is: %s', delta_hidLayer.shape)
         
         
-b = SparseAutoEncoders(numInpUnits = 3,
+        # Compute the weight gradients:
+        delta_hid_to_out_wghts = (1 / m) * np.dot(np.transpose(hidLayerState),
+                                                  delta_outLayer) + (self.lambda_ * hid_to_out_wghts)
+        logging.info('The shape of delta_hid_to_out_wghts is: %s', delta_hid_to_out_wghts.shape)
+        
+        delta_inp_to_hid_wghts = (1 / m) * np.dot(np.transpose(input),
+                                                  delta_hidLayer) + (self.lambda_ * inp_to_hid_wghts)
+        logging.info('The shape of delta_inp_to_hid_wghts is: %s', delta_inp_to_hid_wghts.shape)
+        
+        
+        
+debug = True
+
+if debug:
+    b = SparseAutoEncoders(numInpUnits = 3,
                        numHidUnits = 2,
                        numOutUnits = 3,
                        rho = 0.05, lambda_=0.5, beta =0.3).forwardProp(input=np.array([[1,2,3]], dtype=float))

@@ -115,7 +115,7 @@ class SparseAutoEncoders():
         print ('cost: \n', cost)
         
         
-        # Backward Propagation The derivate term for divergence, The below is just the derivative term repeated
+        # Backward Propagation The derivative term for divergence, The below is just the derivative term repeated
         delta_rho = np.tile(
                 (- rho / rho_hat + (1 - rho) / (1 - rho_hat)),   # This is the derivative (gradient) of rho
                 (m, 1)

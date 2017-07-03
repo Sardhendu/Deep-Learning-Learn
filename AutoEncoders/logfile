@@ -1,14 +1,14 @@
-2017-07-03 14:50:28,413 INFO     The shape of the input is: (1, 3)
-2017-07-03 14:50:28,414 INFO     The shape of the input to hidden weights is: (3, 2)
-2017-07-03 14:50:28,415 INFO     The shape of the input to hidden bias is: (1, 2)
-2017-07-03 14:50:28,415 INFO     The shape of the hidden to output weights is: (2, 3)
-2017-07-03 14:50:28,415 INFO     The shape of the hidden to output bias is: (1, 3)
-2017-07-03 14:50:28,441 INFO     The shape of the hidden layer state is: (1, 2)
-2017-07-03 14:50:28,441 INFO     The shape of the output layer state is: (1, 3)
-2017-07-03 14:50:28,442 INFO     The Average activation (rho_hat) shape (equals the number of Neurons) is: (2,) [ 0.44212892  0.14581745]
-2017-07-03 14:50:28,442 INFO     The reg is: () 2.12505390527
-2017-07-03 14:50:28,442 INFO     The shape of delta_rhois: (1, 2)
-2017-07-03 14:50:28,443 INFO     The shape of delta_outLayer is: (1, 3)
-2017-07-03 14:50:28,443 INFO     The shape of delta_hidLayer is: (1, 2)
-2017-07-03 14:50:28,444 INFO     The shape of delta_hid_to_out_wghts is: (2, 3)
-2017-07-03 14:50:28,444 INFO     The shape of delta_inp_to_hid_wghts is: (3, 2)
+2017-07-03 17:59:31,813 INFO     The shape of the self.input is: (1, 3)
+2017-07-03 17:59:31,814 INFO     The shape of the self.input to hidden weights is: (3, 2)
+2017-07-03 17:59:31,814 INFO     The shape of the self.input to hidden bias is: (1, 2)
+2017-07-03 17:59:31,814 INFO     The shape of the hidden to output weights is: (2, 3)
+2017-07-03 17:59:31,814 INFO     The shape of the hidden to output bias is: (1, 3)
+2017-07-03 17:59:31,823 INFO     The shape of the hidden layer state is: (1, 2)
+2017-07-03 17:59:31,823 INFO     The shape of the output layer state is: (1, 3)
+2017-07-03 17:59:31,823 INFO     The Average activation (rho_hat) shape (equals the number of Neurons) is: (2,) [ 0.44212892  0.14581745]
+2017-07-03 17:59:31,824 INFO     The reg is: () 2.12505390527
+2017-07-03 17:59:31,824 INFO     The shape of delta_rhois: (1, 2)
+2017-07-03 17:59:31,824 INFO     The shape of delta_outLayer is: (1, 3)
+2017-07-03 17:59:31,824 INFO     The shape of delta_hidLayer is: (1, 2)
+2017-07-03 17:59:31,824 INFO     The shape of delta_self.hid_to_out_wghts is: (2, 3)
+2017-07-03 17:59:31,824 INFO     The shape of delta_self.inp_to_hid_wghts is: (3, 2)

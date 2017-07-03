@@ -2,8 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ee2a029f-7072-40ab-968e-ea19299dfce2" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/AutoEncoders/.ipynb_checkpoints/KnowTheMath-checkpoint.ipynb" afterPath="$PROJECT_DIR$/AutoEncoders/.ipynb_checkpoints/KnowTheMath-checkpoint.ipynb" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/AutoEncoders/KnowTheMath.ipynb" afterPath="$PROJECT_DIR$/AutoEncoders/KnowTheMath.ipynb" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/AutoEncoders/Tools.py" afterPath="$PROJECT_DIR$/AutoEncoders/Tools.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/AutoEncoders/logfile" afterPath="$PROJECT_DIR$/AutoEncoders/logfile" />
@@ -24,8 +22,8 @@
       <file leaf-file-name="logfile" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/AutoEncoders/logfile">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="136">
-              <caret line="8" column="39" lean-forward="false" selection-start-line="8" selection-start-column="39" selection-end-line="8" selection-end-column="39" />
+            <state relative-caret-position="17">
+              <caret line="14" column="0" lean-forward="false" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -44,7 +42,7 @@
       <file leaf-file-name="NetworkDesign.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/AutoEncoders/NetworkDesign.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-27">
+            <state relative-caret-position="391">
               <caret line="23" column="43" lean-forward="false" selection-start-line="23" selection-start-column="43" selection-end-line="23" selection-end-column="43" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
@@ -56,8 +54,8 @@
       <file leaf-file-name="Tools.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/AutoEncoders/Tools.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="814">
-              <caret line="139" column="8" lean-forward="true" selection-start-line="139" selection-start-column="8" selection-end-line="139" selection-end-column="8" />
+            <state relative-caret-position="129">
+              <caret line="158" column="8" lean-forward="true" selection-start-line="158" selection-start-column="8" selection-end-line="158" selection-end-column="8" />
               <folding>
                 <element signature="e#0#31#0" expanded="true" />
               </folding>
@@ -83,9 +81,19 @@
       <find>b2</find>
       <find>klDivergence</find>
       <find>beta</find>
+      <find>rho</find>
+      <find>rho_val</find>
+      <find>hid_to_out_bias</find>
+      <find>input</find>
+      <find>numself.inputs</find>
+      <find>hidLayerState</find>
+      <find>outLayerState</find>
     </findStrings>
     <replaceStrings>
       <replace>hid_to_out_bias</replace>
+      <replace>self.hid_to_out_bias</replace>
+      <replace>self.input</replace>
+      <replace>numInputs</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -152,6 +160,20 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="Deep-Neural-Nets" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Deep-Neural-Nets" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Deep-Neural-Nets" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="AutoEncoders" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -761,15 +783,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/AutoEncoders/logfile">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="8" column="39" lean-forward="false" selection-start-line="8" selection-start-column="39" selection-end-line="8" selection-end-column="39" />
+        <state relative-caret-position="17">
+          <caret line="14" column="0" lean-forward="false" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/AutoEncoders/NetworkDesign.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-27">
+        <state relative-caret-position="391">
           <caret line="23" column="43" lean-forward="false" selection-start-line="23" selection-start-column="43" selection-end-line="23" selection-end-column="43" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
@@ -779,8 +801,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/AutoEncoders/Tools.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="814">
-          <caret line="139" column="8" lean-forward="true" selection-start-line="139" selection-start-column="8" selection-end-line="139" selection-end-column="8" />
+        <state relative-caret-position="129">
+          <caret line="158" column="8" lean-forward="true" selection-start-line="158" selection-start-column="8" selection-end-line="158" selection-end-column="8" />
           <folding>
             <element signature="e#0#31#0" expanded="true" />
           </folding>

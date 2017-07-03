@@ -48,101 +48,125 @@ class SparseAutoEncoders():
         :param beta:        The penalty for high divergence.
         """
         
-        self.rho = rho
+        # self.rho_val = rho
         self.lambda_ = lambda_
         self.beta = beta
 
         self.numInpUnits = numInpUnits
         self.numHidUnits = numHidUnits
         self.numOutUnits = numOutUnits
-
-    def forwardProp(self, input, activationType='sigmoid'):
-        numInpUnits = self.numInpUnits
-        numHidUnits = self.numHidUnits
-        numOutUnits = self.numOutUnits
-        m,n = input.shape
         
-        logging.info('The shape of the input is: %s', input.shape)
-        print ('The input is: ', input)
-        a = NetworkDesign(numInpUnits=numInpUnits,
-                          numHidUnits=numHidUnits,
-                          numOutUnits=numOutUnits,
-                        )
-
+        # Repeat teh
+        self.rho = np.tile(rho, self.numHidUnits)
+    
+    def setData(self, input):
+        self.input = input
+        self.m, self.n = input.shape
+        logging.info('The shape of the self.input is: %s', input.shape)
+        print('The self.input is: ', input)
+        
+    def initializeParams(self):
+        a = NetworkDesign(numInpUnits=self.numInpUnits,
+                          numHidUnits=self.numHidUnits,
+                          numOutUnits=self.numOutUnits,
+                          )
+    
         a.initBias()
         a.initWeights()
-        inp_to_hid_wghts = a.params['w'][0]
-        hid_to_out_wghts = a.params['w'][1]
-        inp_to_hid_bias = a.params['b'][0]
-        hid_to_out_bias = a.params['b'][1]
-
         
-        logging.info('The shape of the input to hidden weights is: %s', inp_to_hid_wghts.shape)
-        logging.info('The shape of the input to hidden bias is: %s', inp_to_hid_bias.shape)
-        logging.info('The shape of the hidden to output weights is: %s', hid_to_out_wghts.shape)
-        logging.info('The shape of the hidden to output bias is: %s', hid_to_out_bias.shape)
+        self.inp_to_hid_wghts = a.params['w'][0]
+        self.hid_to_out_wghts = a.params['w'][1]
+        self.inp_to_hid_bias = a.params['b'][0]
+        self.hid_to_out_bias = a.params['b'][1]
+    
+        logging.info('The shape of the self.input to hidden weights is: %s', self.inp_to_hid_wghts.shape)
+        logging.info('The shape of the self.input to hidden bias is: %s', self.inp_to_hid_bias.shape)
+        logging.info('The shape of the hidden to output weights is: %s', self.hid_to_out_wghts.shape)
+        logging.info('The shape of the hidden to output bias is: %s', self.hid_to_out_bias.shape)
+      
         
-        hidLayerState = sigmoid(
-                np.dot(input, inp_to_hid_wghts) + inp_to_hid_bias
-        )
-        logging.info('The shape of the hidden layer state is: %s', hidLayerState.shape)
-
-        # We dont use the sigmoid activation for the output unit,since we are training an Autoencoder.
-        outLayerState = np.dot(hidLayerState, hid_to_out_wghts) + hid_to_out_bias
-        logging.info('The shape of the output layer state is: %s', outLayerState.shape)
-        
+    def sparsity(self, hidLayerState, numInputs):
         # Compute the average activation rho_hat
-        # Each Neuron's output is dot product of weights and input. So here we average the activation (hidden state)
-        # of each neuron.
-        rho_hat = np.sum(hidLayerState, axis=0) / m
-        logging.info('The Average activation (rho_hat) shape (equals the number of Neurons) is: %s %s', rho_hat.shape,
-                     rho_hat)
-        rho = np.tile(self.rho, numHidUnits)
-        divergence = klDivergence(rho, rho_hat)
-        print ('divergence for each hidden units: \n', divergence)
+        self.rho_hat = np.sum(hidLayerState, axis=0) / numInputs
+        logging.info('The Average activation (rho_hat) shape (equals the number of Neurons) is: %s %s',
+                     self.rho_hat.shape, self.rho_hat)
+        divergence = klDivergence(self.rho, self.rho_hat)
+        print('divergence for each hidden units: \n', divergence)
+        return divergence
+    
+    
+    def deltaSparsity(self, numInputs):
+        delta_rho = np.tile(
+                (- self.rho / self.rho_hat + (1 - self.rho) / (1 - self.rho_hat)),  # This is the derivative (
+                # gradient) of
+                #  rho
+                (numInputs, 1)
+        )
+        logging.info('The shape of delta_rhois: %s', delta_rho.shape)
+        print('rho_delta: \n', delta_rho)
+        return delta_rho
+    
+        
+    def forwardProp(self, activationType='sigmoid'):
+        
+        # Compute the hidden layer state
+        self.hidLayerState = sigmoid(
+                np.dot(self.input, self.inp_to_hid_wghts) + self.inp_to_hid_bias
+        )
+        logging.info('The shape of the hidden layer state is: %s', self.hidLayerState.shape)
+
+        # We don't use the sigmoid activation for the output unit,since we are training an Autoencoder.
+        self.outLayerState = np.dot(self.hidLayerState, self.hid_to_out_wghts) + self.hid_to_out_bias
+        logging.info('The shape of the output layer state is: %s', self.outLayerState.shape)
+
+        # Compute the divergence
+        divergence = self.sparsity(self.hidLayerState, numInputs=self.m)
         
         # Compute the regularization parameter
-        reg = np.sum(inp_to_hid_wghts**2) + np.sum(hid_to_out_wghts**2)
+        reg = np.sum(self.inp_to_hid_wghts**2) + np.sum(self.hid_to_out_wghts**2)
         logging.info('The reg is: %s %s', reg.shape, reg)
         
         # Compute the cost function (minimum squared error)
-        # In Auto-Encoders the input is the output, we just use the hidden layer to learn interesting representation
+        # In Auto-Encoders the self.input is the output, we just use the hidden layer to learn interesting representation
         # or weights for latent factors
-        cost = (1/2*m) * pow(np.sum(outLayerState - input), 2) + \
+        cost = (1/2*self.m) * pow(np.sum(self.outLayerState - self.input), 2) + \
                ((self.lambda_/2) * reg) + \
                (self.beta * np.sum(divergence))
         
         print ('cost: \n', cost)
         
-        
+
+    def backwardProp(self):
         # Backward Propagation The derivative term for divergence, The below is just the derivative term repeated
-        delta_rho = np.tile(
-                (- rho / rho_hat + (1 - rho) / (1 - rho_hat)),   # This is the derivative (gradient) of rho
-                (m, 1)
-        )
-        logging.info('The shape of delta_rhois: %s', delta_rho.shape)
-        print ('rho_delta: \n', delta_rho)
-        
-        
+        delta_rho = self.deltaSparsity(numInputs = self.m)
+
         # Compute the gradients for the Output state and hidden state
-        delta_outLayer = -(input - outLayerState)
+        delta_outLayer = -(self.input - self.outLayerState)
         logging.info('The shape of delta_outLayer is: %s', delta_outLayer.shape)
-        delta_hidLayer = (np.dot(delta_outLayer, np.transpose(hid_to_out_wghts)) + \
+        delta_hidLayer = (np.dot(delta_outLayer, np.transpose(self.hid_to_out_wghts)) + \
                           + self.beta * delta_rho
-                          )* sigmoid(hidLayerState) * (1 - sigmoid(hidLayerState))
+                          ) * sigmoid(self.hidLayerState) * (1 - sigmoid(self.hidLayerState))
         logging.info('The shape of delta_hidLayer is: %s', delta_hidLayer.shape)
-        
-        
+
         # Compute the weight gradients:
-        delta_hid_to_out_wghts = (1 / m) * np.dot(np.transpose(hidLayerState),
-                                                  delta_outLayer) + (self.lambda_ * hid_to_out_wghts)
-        logging.info('The shape of delta_hid_to_out_wghts is: %s', delta_hid_to_out_wghts.shape)
+        delta_hid_to_out_wghts = (1 / self.m) * np.dot(np.transpose(self.hidLayerState),
+                                                  delta_outLayer) + (self.lambda_ * self.hid_to_out_wghts)
+        logging.info('The shape of delta_self.hid_to_out_wghts is: %s', delta_hid_to_out_wghts.shape)
+
+        delta_inp_to_hid_wghts = (1 / self.m) * np.dot(np.transpose(self.input),
+                                                  delta_hidLayer) + (self.lambda_ * self.inp_to_hid_wghts)
+        logging.info('The shape of delta_self.inp_to_hid_wghts is: %s', delta_inp_to_hid_wghts.shape)
         
-        delta_inp_to_hid_wghts = (1 / m) * np.dot(np.transpose(input),
-                                                  delta_hidLayer) + (self.lambda_ * inp_to_hid_wghts)
-        logging.info('The shape of delta_inp_to_hid_wghts is: %s', delta_inp_to_hid_wghts.shape)
+        
+        # Compute the New Weights:
         
         
+        
+    def computeNetwork(self, input):
+        self.setData(input)
+        self.initializeParams()
+        self.forwardProp(activationType="sigmoid")
+        self.backwardProp()
         
 debug = True
 
@@ -150,4 +174,20 @@ if debug:
     b = SparseAutoEncoders(numInpUnits = 3,
                        numHidUnits = 2,
                        numOutUnits = 3,
-                       rho = 0.05, lambda_=0.5, beta =0.3).forwardProp(input=np.array([[1,2,3]], dtype=float))
+                       rho = 0.05, lambda_=0.5, beta =0.3).computeNetwork(input=np.array([[1, 2, 3]], dtype=float))
+#
+#     / Users / sam / App - Setup / anaconda / bin / python3
+#     .6 / Users / sam / All - Program / App / Deep - Neural - Nets / AutoEncoders / Tools.py
+#     The
+#     self.input is: [[1.  2.  3.]]
+#     divergence
+#     for each hidden units:
+#         [0.12638137 - 0.03801374]
+#     cost:
+#     20.9276832596
+# rho_delta:
+# [[1.5898132   0.76927993]]
+#
+# Process
+# finished
+# with exit code 0

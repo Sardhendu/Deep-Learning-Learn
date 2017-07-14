@@ -171,7 +171,7 @@ class SparseAutoEncoders():
 debug = True
 
 if debug:
-    b = SparseAutoEncoders(numInpUnits = 3,
+    SparseAutoEncoders(numInpUnits = 3,
                        numHidUnits = 2,
                        numOutUnits = 3,
                        rho = 0.05, lambda_=0.5, beta =0.3).computeNetwork(input=np.array([[1, 2, 3]], dtype=float))

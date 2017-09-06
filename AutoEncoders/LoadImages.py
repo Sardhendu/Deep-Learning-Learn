@@ -54,6 +54,6 @@ def CIFAR10():
         pickle.dump(pickleData, f, pickle.HIGHEST_PROTOCOL)
 
 
-debugg = False
+debugg = True
 if debugg:
     CIFAR10()

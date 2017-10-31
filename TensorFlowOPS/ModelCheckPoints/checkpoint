@@ -1,0 +1,2 @@
+model_checkpoint_path: "/Users/sam/All-Program/App/Deep-Neural-Nets/TensorFlowOPS/ModelCheckPoints/my_test_model-1000"
+all_model_checkpoint_paths: "/Users/sam/All-Program/App/Deep-Neural-Nets/TensorFlowOPS/ModelCheckPoints/my_test_model-1000"
